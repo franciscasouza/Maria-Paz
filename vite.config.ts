@@ -13,7 +13,24 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(__dirname, '.'),
       }
+    },
+    // Configuração HTTPS apenas para desenvolvimento
+    ...(mode === 'development' && {
+      server: {
+        // https: {} // Descomente para habilitar HTTPS local
+      }
+    }),
+    // Otimizações para produção
+    build: {
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            genai: ['@google/genai']
+          }
+        }
+      }
     }
-    // HTTPS removido temporariamente devido a incompatibilidade
   };
 });
