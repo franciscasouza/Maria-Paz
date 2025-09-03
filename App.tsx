@@ -24,6 +24,7 @@ import ErrorScreen from './components/demo/ErrorSreen';
 import KeynoteCompanion from './components/demo/keynote-companion/KeynoteCompanion';
 import Header from './components/Header';
 import UserSettings from './components/UserSettings';
+import MicrophoneTest from './components/MicrophoneTest';
 import { LiveAPIProvider } from './contexts/LiveAPIContext';
 import { useUI, useUser } from './lib/state';
 
@@ -42,6 +43,7 @@ function App() {
   const { showUserConfig, showAgentEdit } = useUI();
   return (
     <div className="App">
+      <MicrophoneTest />
       <LiveAPIProvider apiKey={API_KEY}>
         <ErrorScreen />
         <Header />
