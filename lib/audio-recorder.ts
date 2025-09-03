@@ -60,14 +60,23 @@ export class AudioRecorder extends EventEmitter<AudioRecorderEventTypes> {
       throw new Error('Could not request user media');
     }
 
+    // Verificar se já está rodando HTTPS
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      console.warn('Audio capture may not work on non-HTTPS sites');
+    }
+
     this.starting = new Promise(async (resolve, reject) => {
       try {
+        console.log('Requesting microphone access...');
         this.stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
             echoCancellation: true,
-            noiseSuppression: true
+            noiseSuppression: true,
+            sampleRate: this.sampleRate
           } 
         });
+        console.log('Microphone access granted');
+        
         this.audioContext = await audioContext({ sampleRate: this.sampleRate });
         this.source = this.audioContext.createMediaStreamSource(this.stream);
 

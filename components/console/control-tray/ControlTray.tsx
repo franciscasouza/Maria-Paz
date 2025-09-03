@@ -33,10 +33,37 @@ export type ControlTrayProps = {
 function ControlTray({ children }: ControlTrayProps) {
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
 
   const { showAgentEdit, showUserConfig } = useUI();
   const { client, connected, connect, disconnect } = useLiveAPIContext();
+
+  // Teste de diagnóstico de áudio
+  const testAudio = async () => {
+    try {
+      setAudioError(null);
+      console.log('Testing audio...');
+      
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('getUserMedia not supported');
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true
+        } 
+      });
+      
+      console.log('Audio test successful');
+      stream.getTracks().forEach(track => track.stop());
+      setAudioError('✅ Microfone funcionando!');
+    } catch (error) {
+      console.error('Audio test failed:', error);
+      setAudioError(`❌ Erro: ${error.message}`);
+    }
+  };
 
   // Stop the current agent if the user is editing the agent or user config
   useEffect(() => {
@@ -61,7 +88,11 @@ function ControlTray({ children }: ControlTrayProps) {
       ]);
     };
     if (connected && !muted && audioRecorder) {
-      audioRecorder.on('data', onData).start();
+      audioRecorder.on('data', onData);
+      audioRecorder.start().catch((error) => {
+        console.error('Failed to start audio recorder:', error);
+        setAudioError(`❌ Erro ao iniciar microfone: ${error.message}`);
+      });
     } else {
       audioRecorder.stop();
     }
@@ -72,7 +103,28 @@ function ControlTray({ children }: ControlTrayProps) {
 
   return (
     <section className="control-tray">
+      {audioError && (
+        <div className="audio-status" style={{ 
+          padding: '8px', 
+          margin: '8px', 
+          backgroundColor: audioError.includes('✅') ? '#d4edda' : '#f8d7da',
+          borderRadius: '4px',
+          fontSize: '12px'
+        }}>
+          {audioError}
+        </div>
+      )}
+      
       <nav className={cn('actions-nav', { disabled: !connected })}>
+        <button
+          className={cn('action-button')}
+          onClick={testAudio}
+          title="Testar microfone"
+          style={{ fontSize: '18px' }}
+        >
+          🎤
+        </button>
+        
         <button
           className={cn('action-button mic-button')}
           onClick={() => setMuted(!muted)}
