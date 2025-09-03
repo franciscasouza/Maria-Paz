@@ -23,15 +23,14 @@ import ControlTray from './components/console/control-tray/ControlTray';
 import ErrorScreen from './components/demo/ErrorSreen';
 import KeynoteCompanion from './components/demo/keynote-companion/KeynoteCompanion';
 import Header from './components/Header';
-import UserSettings from './components/UserSettings';
-import MicrophoneTest from './components/MicrophoneTest';
-import { LiveAPIProvider } from './contexts/LiveAPIContext';
-import { useUI, useUser } from './lib/state';
+import UserSettings from "./components/UserSettings";
+import { LiveAPIProvider } from "./contexts/LiveAPIContext";
+import { useUI, useUser } from "./lib/state";
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
-if (typeof API_KEY !== 'string') {
+if (typeof API_KEY !== "string") {
   throw new Error(
-    'Missing required environment variable: REACT_APP_GEMINI_API_KEY'
+    "Missing required environment variable: REACT_APP_GEMINI_API_KEY"
   );
 }
 
@@ -43,7 +42,6 @@ function App() {
   const { showUserConfig, showAgentEdit } = useUI();
   return (
     <div className="App">
-      <MicrophoneTest />
       <LiveAPIProvider apiKey={API_KEY}>
         <ErrorScreen />
         <Header />
